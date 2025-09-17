@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -5,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
 
     public AudioClip deathClip;
-    public float jumpForce = 700f;
+    public float jumpForce = 400f;
 
     private int jumpCount = 0;
     private bool isGrounded = false;
@@ -22,24 +23,7 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         playerAudio = GetComponent<AudioSource>();
     }
-    private void die()
-    {
-
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-
-    }
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-
-    }
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-
-    }
-    // Update is called once per frame
+   
     private void Update()
     {
         if (isDead)
@@ -65,6 +49,33 @@ public class PlayerController : MonoBehaviour
 
         animator.SetBool("Grounded", isGrounded);
     }
+    private void Die()
+    {
+        animator.SetTrigger("Die");
+        playerAudio.clip = deathClip;
+        playerAudio.Play();
+        playerRigidbody.linearVelocity = Vector2.zero;
+        isDead = true;
 
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
 
+        if (other.tag == "Dead" && !isDead)
+        {
+
+        }
+        Die();
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.contacts[0].normal.y > 0.7f)
+        {
+            isGrounded = true;
+            jumpCount = 0;
+        }
+    }
+    private void OnCollisionExit2D(Collision2D collision) {
+        isGrounded = false;
+    }
 }
