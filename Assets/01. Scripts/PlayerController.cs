@@ -56,16 +56,15 @@ public class PlayerController : MonoBehaviour
         playerAudio.Play();
         playerRigidbody.linearVelocity = Vector2.zero;
         isDead = true;
+        GameManager.instance.OnPlayerDead();
 
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-
-        if (other.tag == "Dead" && !isDead)
+        if (other.tag == "DEAD" && !isDead)
         {
-
-        }
-        Die();
+            Die();
+        }        
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
