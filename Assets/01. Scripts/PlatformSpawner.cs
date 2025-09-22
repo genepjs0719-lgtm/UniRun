@@ -1,65 +1,56 @@
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-
+//오브젝트 폴링->미리 몇개의 오브젝트를 생성하고 재활용
 public class PlatformSpawner : MonoBehaviour
 {
-
     [SerializeField] GameObject platformPrefab;
     int count = 3;
-
-    float timeBestSpawnMin = 1.25f;
-    float timeBestSpawnMax = 2.25f;
-    float timeBestSpawn;
-
+    Vector3 poolPosition = new Vector3(0, -25, 0);
+    GameObject[] platforms;
+    //발판의 출발지
+    float posX = 20;
     float yMin = -3.5f;
     float yMax = 1.5f;
-    float xPos = 20;
+    float posY;
+    //발판의 생성 간격->timer
+    float spawnMin = 1.25f;
+    float spawnMax = 2.25f;
+    float spawnTime;
+    float lastSpawnTime;
 
-    GameObject[] platforms;
-    int currentIndex = 0;
-
-    Vector2 poolPosition = new Vector2(0, -25);
-    private float lastSpawnTime;
-
+    int currIndex;
     void Start()
     {
         platforms = new GameObject[count];
-
+        //ctrl+k,d
         for (int i = 0; i < count; i++)
         {
             platforms[i] = Instantiate(platformPrefab, poolPosition, Quaternion.identity);
-
         }
         lastSpawnTime = 0f;
-        timeBestSpawn = 0f;
+        spawnTime = 0f;
     }
+
 
     void Update()
     {
-        if (GameManager.instance.isGameover)
+        if (GameManager.instance.isGameover) return;
+
+        //마지막 배치 시점 이후....
+        if (Time.time >= lastSpawnTime + spawnTime)
         {
-            return;
-        }
-        if (Time.time >= lastSpawnTime + timeBestSpawn)
+            lastSpawnTime = Time.time;
+            spawnTime = Random.Range(spawnMin, spawnMax);
 
-        {
-            lastSpawnTime += Time.time;
+            platforms[currIndex].SetActive(false);
+            platforms[currIndex].SetActive(true);
 
-            timeBestSpawn = Random.Range(timeBestSpawnMin, timeBestSpawnMax);
+            posY = Random.Range(yMin, yMax);
+            platforms[currIndex].transform.position = new Vector2(posX, posY);
 
-            float yPos = Random.Range(yMin, yMax);
-            platforms[currentIndex].SetActive(false);
-            platforms[currentIndex].SetActive(true);
-
-            platforms[currentIndex].transform.position = new Vector2(xPos, yPos);
-
-            currentIndex++;
-
-            if (currentIndex >= count)
+            if (++currIndex == count)
             {
-                currentIndex = 0;
+                currIndex = 0;
             }
-       
         }
     }
 }

@@ -1,35 +1,38 @@
-using System.Threading;
 using UnityEngine;
 
+// 발판으로서 필요한 동작을 담은 스크립트
 public class Platform : MonoBehaviour
 {
-    public GameObject[] obstacles;
-    private bool stepped = false;
+    [SerializeField] GameObject[] obstacles;
+    bool stepped;
+    int count;
 
     private void OnEnable()
     {
+        count = 0;
         stepped = false;
 
         for (int i = 0; i < obstacles.Length; i++)
         {
-            if (Random.Range(0, 3) == 0)
+            if (Random.Range(0, 3) == 2)
             {
                 obstacles[i].SetActive(true);
+                count++;
+                //count = count + 1; count += 1; ++count;
             }
             else
-            {
                 obstacles[i].SetActive(false);
-            }
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    //충돌
+    private void OnCollisionEnter2D(Collision2D coll)
     {
-        if (collision.collider.tag == "Player" && !stepped)
+        if (!stepped && coll.transform.tag == "Player")
         {
             stepped = true;
-            GameManager.instance.AddScore(1);
+            int newScore = count + 1;
+            GameManager.instance.AddScore(newScore);
         }
     }
-
 }
